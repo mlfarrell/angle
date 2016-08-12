@@ -871,6 +871,9 @@ GL_APICALL void GL_APIENTRY glVertexAttribDivisorANGLE (GLuint index, GLuint div
 #define GL_FRAMEBUFFER_ATTACHMENT_ANGLE   0x93A3
 #endif /* GL_ANGLE_texture_usage */
 
+//HACK - mlf
+#define GL_HOLOGRAPHIC_MATRICES_ANGLE     0xFFFF1
+
 #ifndef GL_ANGLE_translated_shader_source
 #define GL_ANGLE_translated_shader_source 1
 #define GL_TRANSLATED_SHADER_SOURCE_LENGTH_ANGLE 0x93A0

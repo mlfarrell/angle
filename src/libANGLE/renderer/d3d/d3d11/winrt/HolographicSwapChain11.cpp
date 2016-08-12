@@ -44,6 +44,18 @@ using namespace ABI::Windows::Graphics::DirectX::Direct3D11;
 using namespace ABI::Windows::Graphics::Holographic;
 using namespace ABI::Windows::Perception::Spatial;
 
+///HACK - mlf
+namespace gl
+{
+  static DirectX::XMFLOAT4X4 gHoloViewProj[2];
+
+  void AngleHolographicGetHoloMatrices(float *matricesViewProjection2)
+  {
+    memcpy(matricesViewProjection2, gHoloViewProj, sizeof(float) * 16 * 2);
+  }
+}
+///end hack
+
 namespace rx
 {
 
@@ -457,6 +469,8 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
                     /*DirectX::XMMatrixTranspose*/(
                         DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&viewTransform.Right)) * DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&projectionTransform.Right)))
                 );
+
+                memcpy(gl::gHoloViewProj, viewProj, sizeof(float) * 16 * 2);
 
                 // get the current program
                 context = gl::GetValidGlobalContext();

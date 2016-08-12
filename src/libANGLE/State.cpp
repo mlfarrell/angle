@@ -1384,6 +1384,11 @@ void State::getBooleanv(GLenum pname, GLboolean *params)
     }
 }
 
+///HACK - mlf
+#ifdef ANGLE_ENABLE_WINDOWS_HOLOGRAPHIC
+void AngleHolographicGetHoloMatrices(float *matricesViewProjection2);
+#endif
+
 void State::getFloatv(GLenum pname, GLfloat *params)
 {
     // Please note: DEPTH_CLEAR_VALUE is included in our internal getFloatv implementation
@@ -1413,6 +1418,11 @@ void State::getFloatv(GLenum pname, GLfloat *params)
         params[2] = mBlendColor.blue;
         params[3] = mBlendColor.alpha;
         break;
+
+      case GL_HOLOGRAPHIC_MATRICES_ANGLE:
+        AngleHolographicGetHoloMatrices(params);
+        break;
+
       default:
         UNREACHABLE();
         break;
