@@ -102,22 +102,26 @@ gl::Error Framebuffer11::clear(const gl::Data &data, const ClearParameters &clea
     {
         return error;
     }
-    SurfaceRenderTarget11 *surfaceRenderTarget11 = dynamic_cast<SurfaceRenderTarget11 *>(colorHolographicRenderTarget);
-    if (surfaceRenderTarget11 != nullptr)
+
+    if(colorHolographicRenderTarget->isHolographic())
     {
+      SurfaceRenderTarget11 *surfaceRenderTarget11 = GetAs<SurfaceRenderTarget11>(colorHolographicRenderTarget);// dynamic_cast<SurfaceRenderTarget11 *>(colorHolographicRenderTarget);
+      if(surfaceRenderTarget11 != nullptr)
+      {
         HolographicSwapChain11* holographicSwapChain = surfaceRenderTarget11->getHolographicSwapChain11();
-        if (holographicSwapChain != nullptr)
+        if(holographicSwapChain != nullptr)
         {
-            HolographicNativeWindow* holographicNativeWindow = holographicSwapChain->getHolographicNativeWindow();
-            if (holographicNativeWindow != nullptr)
+          HolographicNativeWindow* holographicNativeWindow = holographicSwapChain->getHolographicNativeWindow();
+          if(holographicNativeWindow != nullptr)
+          {
+            HRESULT hrFromCameraUpdate = holographicNativeWindow->UpdateHolographicResources();
+            if(FAILED(hrFromCameraUpdate))
             {
-                HRESULT hrFromCameraUpdate = holographicNativeWindow->UpdateHolographicResources();
-                if (FAILED(hrFromCameraUpdate))
-                {
-                    return gl::Error(GL_INVALID_OPERATION);
-                }
+              return gl::Error(GL_INVALID_OPERATION);
             }
+          }
         }
+      }
     }
 #endif
 
