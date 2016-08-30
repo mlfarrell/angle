@@ -10,6 +10,13 @@
 
 using namespace ABI::Windows::Foundation::Collections;
 
+//HACK - mlf
+static ComPtr<ABI::Windows::Perception::IPerceptionTimestamp> mostRecentPredictionTimestamp;
+__declspec(dllexport) ComPtr<ABI::Windows::Perception::IPerceptionTimestamp> AngleHolographicGetCurrentPredictionTimestamp()
+{
+  return mostRecentPredictionTimestamp;
+}
+
 namespace rx
 {
 
@@ -486,11 +493,17 @@ HRESULT HolographicNativeWindow::UpdateHolographicResources()
         if (mStationaryReferenceFrame != nullptr)
         {
             hr = mStationaryReferenceFrame->get_CoordinateSystem(mCoordinateSystem.GetAddressOf());
+
+            ComPtr<ABI::Windows::Perception::IPerceptionTimestamp> timestamp;
+            hr = prediction->get_Timestamp(timestamp.GetAddressOf());
+            if (SUCCEEDED(hr))
+              mostRecentPredictionTimestamp = timestamp;
         }
         else if (mStationaryReferenceFrame != nullptr)
         {
             ComPtr<ABI::Windows::Perception::IPerceptionTimestamp> timestamp;
             hr = prediction->get_Timestamp(timestamp.GetAddressOf());
+            mostRecentPredictionTimestamp = timestamp;
             if (SUCCEEDED(hr))
             {
                 hr = mAttachedReferenceFrame->GetStationaryCoordinateSystemAtTimestamp(timestamp.Get(), mCoordinateSystem.GetAddressOf());
