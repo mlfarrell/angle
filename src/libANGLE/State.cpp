@@ -1386,7 +1386,7 @@ void State::getBooleanv(GLenum pname, GLboolean *params)
 
 ///HACK - mlf
 #ifdef ANGLE_ENABLE_WINDOWS_HOLOGRAPHIC
-void AngleHolographicGetHoloMatrices(float *matricesViewProjection2);
+void AngleHolographicGetHoloMatrices(float *matrices, int type);
 #endif
 
 void State::getFloatv(GLenum pname, GLfloat *params)
@@ -1419,8 +1419,14 @@ void State::getFloatv(GLenum pname, GLfloat *params)
         params[3] = mBlendColor.alpha;
         break;
 
-      case GL_HOLOGRAPHIC_MATRICES_ANGLE:
-        AngleHolographicGetHoloMatrices(params);
+      case GL_HOLOGRAPHIC_MVP_MATRICES_ANGLE:
+        AngleHolographicGetHoloMatrices(params, 0);
+        break;
+      case GL_HOLOGRAPHIC_MV_MATRICES_ANGLE:
+        AngleHolographicGetHoloMatrices(params, 1);
+        break;
+      case GL_HOLOGRAPHIC_P_MATRICES_ANGLE:
+        AngleHolographicGetHoloMatrices(params, 2);
         break;
 
       default:

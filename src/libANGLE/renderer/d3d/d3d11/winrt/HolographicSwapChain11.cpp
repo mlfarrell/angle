@@ -48,10 +48,17 @@ using namespace ABI::Windows::Perception::Spatial;
 namespace gl
 {
   static DirectX::XMFLOAT4X4 gHoloViewProj[2];
+  static DirectX::XMFLOAT4X4 gHoloMView[2];
+  static DirectX::XMFLOAT4X4 gHoloProj[2];
 
-  void AngleHolographicGetHoloMatrices(float *matricesViewProjection2)
+  void AngleHolographicGetHoloMatrices(float *matrices, int type)
   {
-    memcpy(matricesViewProjection2, gHoloViewProj, sizeof(float) * 16 * 2);
+    if(type == 0)
+      memcpy(matrices, gHoloViewProj, sizeof(float) * 16 * 2);
+    else if(type == 1)
+      memcpy(matrices, gHoloMView, sizeof(float) * 16 * 2);
+    else if(type == 2)
+      memcpy(matrices, gHoloProj, sizeof(float) * 16 * 2);
   }
 }
 ///end hack
@@ -452,6 +459,9 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
             }
 
             static DirectX::XMFLOAT4X4 viewProj[2];
+            static DirectX::XMFLOAT4X4 view[2];
+            static DirectX::XMFLOAT4X4 proj[2];
+
             gl::Program *program = nullptr;
             gl::Context *context = nullptr;
             if (SUCCEEDED(result))
@@ -470,7 +480,14 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
                         DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&viewTransform.Right)) * DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&projectionTransform.Right)))
                 );
 
+                DirectX::XMStoreFloat4x4(gl::gHoloMView, DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&viewTransform.Left)));
+                DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4 *)(((float *)gl::gHoloMView)+16), DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&viewTransform.Right)));
+                DirectX::XMStoreFloat4x4(gl::gHoloProj, DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&projectionTransform.Left)));
+                DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4 *)(((float *)gl::gHoloProj)+16), DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&projectionTransform.Right)));
+
                 memcpy(gl::gHoloViewProj, viewProj, sizeof(float) * 16 * 2);
+                //memcpy(gl::gHoloMView, view, sizeof(float) * 16 * 2);
+                //memcpy(gl::gHoloProj, proj, sizeof(float) * 16 * 2);
 
                 // get the current program
                 context = gl::GetValidGlobalContext();

@@ -1497,7 +1497,7 @@ bool ValidateUniformMatrix(gl::Context *context, GLenum matrixType, GLint locati
 bool ValidateStateQuery(gl::Context *context, GLenum pname, GLenum *nativeType, unsigned int *numParams)
 {
   //HACK - mlf
-  if(pname == GL_HOLOGRAPHIC_MATRICES_ANGLE)
+  if(pname >= GL_HOLOGRAPHIC_MVP_MATRICES_ANGLE && pname <= GL_HOLOGRAPHIC_P_MATRICES_ANGLE)
   {
     *nativeType = GL_FLOAT;
     return true;
