@@ -13,6 +13,7 @@
 #include "libANGLE/renderer/d3d/d3d11/winrt/HolographicSwapChain11.h"
 
 #include <windows.graphics.directx.direct3d11.interop.h>
+#include <windows.foundation.numerics.h>
 
 #include <directxmath.h>
 #include <windowsnumerics.h>
@@ -61,6 +62,31 @@ namespace gl
       memcpy(matrices, gHoloProj, sizeof(float) * 16 * 2);
   }
 }
+
+static ABI::Windows::Foundation::Numerics::Vector3 gHoloFocusPos, gHoloFocusNorm, gHoloFocusVeloc;
+static bool gHoloFocusPosEnabled = false, gHoloFocusNormEnabled = false, gHoloFocusVelocEnabled = false;
+
+__declspec(dllexport) void AngleHolographicSetCurrentFocusPointParameters(const float pos[3], const float normal[3], const float velocity[3])
+{
+  gHoloFocusPosEnabled = gHoloFocusNormEnabled = gHoloFocusVelocEnabled = false;
+
+  if(pos)
+  {
+    gHoloFocusPos = { pos[0], pos[1], pos[2] };
+    gHoloFocusPosEnabled = true;
+  }
+  if(normal)
+  {
+    gHoloFocusNorm = { normal[0], normal[1], normal[2] };
+    gHoloFocusNormEnabled = true;
+  }
+  if(velocity)
+  {
+    gHoloFocusVeloc = { velocity[0], velocity[1], velocity[2] };
+    gHoloFocusVelocEnabled = true;
+  }
+}
+
 ///end hack
 
 namespace rx
@@ -431,10 +457,9 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
             static_cast<EGLint>(mD3DRenderTargetSize.Height));
     }
 
+    static ComPtr<ABI::Windows::Perception::Spatial::ISpatialCoordinateSystem> coordinateSystem = mHolographicNativeWindow->GetCoordinateSystem();
     if (SUCCEEDED(result))
     {
-        static ComPtr<ABI::Windows::Perception::Spatial::ISpatialCoordinateSystem> coordinateSystem = mHolographicNativeWindow->GetCoordinateSystem();
-
         if (coordinateSystem != nullptr)
         {
             ComPtr<ABI::Windows::Graphics::Holographic::IHolographicCameraPose> pose;
@@ -524,6 +549,25 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
         {
             // TODO: Handle error scenario
         }
+    }
+
+    if (SUCCEEDED(result))
+    {
+      if(gHoloFocusPosEnabled && coordinateSystem)
+      {
+        if(gHoloFocusVelocEnabled && gHoloFocusNormEnabled)
+        {
+          pCameraRenderingParameters->SetFocusPointWithNormalLinearVelocity(coordinateSystem.Get(), gHoloFocusPos, gHoloFocusNorm, gHoloFocusVeloc);
+        }
+        else if(gHoloFocusNormEnabled)
+        {
+          pCameraRenderingParameters->SetFocusPointWithNormal(coordinateSystem.Get(), gHoloFocusPos, gHoloFocusNorm);
+        }
+        else
+        {
+          pCameraRenderingParameters->SetFocusPoint(coordinateSystem.Get(), gHoloFocusPos);
+        }
+      }
     }
 
     if (FAILED(result))
