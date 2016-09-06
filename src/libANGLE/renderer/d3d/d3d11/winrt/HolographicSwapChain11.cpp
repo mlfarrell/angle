@@ -87,6 +87,17 @@ __declspec(dllexport) void AngleHolographicSetCurrentFocusPointParameters(const 
   }
 }
 
+static ID3D11Device *gDevice = nullptr;
+static ID3D11DeviceContext *gContext = nullptr;
+__declspec(dllexport) ID3D11Device *AngleHolographicGetCurrentDevice()
+{
+  return gDevice;
+}
+__declspec(dllexport) ID3D11DeviceContext *AngleHolographicGetCurrentDeviceContext()
+{
+  return gContext;
+}
+
 ///end hack
 
 namespace rx
@@ -632,6 +643,9 @@ EGLint HolographicSwapChain11::reset(int backbufferWidth, int backbufferHeight, 
 
     if (SUCCEEDED(hr))
     {
+        gDevice = mRenderer->getDevice();
+        gContext = mRenderer->getDeviceContext();
+
         if (mParameters != parameters)
         {
             mParameters = parameters;
