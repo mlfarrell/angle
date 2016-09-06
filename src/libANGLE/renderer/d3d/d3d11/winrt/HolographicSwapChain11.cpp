@@ -13,6 +13,7 @@
 #include "libANGLE/renderer/d3d/d3d11/winrt/HolographicSwapChain11.h"
 
 #include <windows.graphics.directx.direct3d11.interop.h>
+#include <windows.perception.spatial.h>
 #include <windows.foundation.numerics.h>
 
 #include <directxmath.h>
@@ -86,6 +87,13 @@ __declspec(dllexport) void AngleHolographicSetCurrentFocusPointParameters(const 
     gHoloFocusVelocEnabled = true;
   }
 }
+
+static ComPtr<ABI::Windows::Foundation::IReference<ABI::Windows::Perception::Spatial::SpatialBoundingFrustum>> gBoundingFrustum;
+__declspec(dllexport) decltype(gBoundingFrustum) AngleHolographicGetCurrentBoundingFrustum()
+{
+  return gBoundingFrustum;
+}
+
 
 static ID3D11Device *gDevice = nullptr;
 static ID3D11DeviceContext *gContext = nullptr;
@@ -475,6 +483,10 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
         {
             ComPtr<ABI::Windows::Graphics::Holographic::IHolographicCameraPose> pose;
             result = mHolographicNativeWindow->GetHolographicCameraPoses()->GetAt(mId, pose.GetAddressOf());
+
+            //TODO: make this optional if users don't need this (it would waste valuable frame computaton time)
+            if (!SUCCEEDED(pose->TryGetCullingFrustum(coordinateSystem.Get(), gBoundingFrustum.GetAddressOf())))
+              gBoundingFrustum.Reset();
 
             ABI::Windows::Graphics::Holographic::HolographicStereoTransform viewTransform;
             if (SUCCEEDED(result))
