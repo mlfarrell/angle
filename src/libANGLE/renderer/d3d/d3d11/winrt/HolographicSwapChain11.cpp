@@ -128,7 +128,7 @@ bool NeedsOffscreenTexture(Renderer11 *renderer, NativeWindow nativeWindow, EGLi
 
 DirectX::XMFLOAT4X4 HolographicSwapChain11::mMidViewMatrix;
 DirectX::XMFLOAT4X4 HolographicSwapChain11::mMidViewMatrixInverse;
-bool HolographicSwapChain11::mUseAutomaticStereoRendering              = true;
+bool HolographicSwapChain11::mUseAutomaticStereoRendering              = false;
 bool HolographicSwapChain11::mUseAutomaticDepthBasedImageStabilization = false;
 bool HolographicSwapChain11::mWaitForVBlank = true;
 
@@ -594,11 +594,9 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
     }
 
     //static ComPtr<ABI::Windows::Perception::Spatial::ISpatialCoordinateSystem> coordinateSystem = mHolographicNativeWindow->GetCoordinateSystem();
+    ComPtr<ABI::Windows::Perception::Spatial::ISpatialCoordinateSystem> coordinateSystem = mHolographicNativeWindow->GetCoordinateSystem();
     if (SUCCEEDED(result))
     {
-        ComPtr<ABI::Windows::Perception::Spatial::ISpatialCoordinateSystem> coordinateSystem = 
-            mHolographicNativeWindow->GetCoordinateSystem();
-
         if (coordinateSystem != nullptr)
         {
             ComPtr<ABI::Windows::Graphics::Holographic::IHolographicCameraPose> pose;
@@ -636,6 +634,9 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
 
             if (SUCCEEDED(result))
             {
+                gDevice = mRenderer->getDevice();
+                gContext = mRenderer->getDeviceContext();
+
                 // Update the view matrices. Holographic cameras (such as Microsoft HoloLens) are
                 // constantly moving relative to the world. The view matrices need to be updated
                 // every frame.
@@ -656,7 +657,7 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
                 const auto rightViewMatrix = DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&viewTransform.Right));
                 
                 // interpolate view matrix
-                if (mHolographicCameraId == 0)
+                if (mHolographicCameraId == 0 && mUseAutomaticStereoRendering)
                 {
                     ComputeMidViewMatrix(leftViewMatrix, rightViewMatrix);
                 }
