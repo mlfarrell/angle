@@ -2093,13 +2093,13 @@ gl::Error Renderer11::drawElementsImpl(const gl::Data &data,
 
     if (instances > 0)
     {
-#ifdef ANGLE_ENABLE_WINDOWS_HOLOGRAPHIC
-        // On Windows Holographic, we use instancing to do stereo rendering with one draw call.
-        return drawInstancedToCamerasIfHolographic(data, count, instances, -minIndex);
-#else
+//#ifdef ANGLE_ENABLE_WINDOWS_HOLOGRAPHIC
+//        // On Windows Holographic, we use instancing to do stereo rendering with one draw call.
+//        return drawInstancedToCamerasIfHolographic(data, count, instances, -minIndex);
+//#else
         mDeviceContext->DrawIndexedInstanced(count, instances, 0, -minIndex, 0);
         return gl::Error(GL_NO_ERROR);
-#endif
+//#endif
     }
 
     // If the shader is writing to gl_PointSize, then pointsprites are being rendered.
@@ -2219,12 +2219,12 @@ gl::Error Renderer11::drawLineLoop(const gl::Data &data,
 
     if (instances > 0)
     {
-#ifdef ANGLE_ENABLE_WINDOWS_HOLOGRAPHIC
-        // On Windows Holographic, we draw differently to the holographic camera.
-        return drawInstancedToCamerasIfHolographic(data, indexCount, instances, baseVertexLocation);
-#else
+//#ifdef ANGLE_ENABLE_WINDOWS_HOLOGRAPHIC
+//        // On Windows Holographic, we draw differently to the holographic camera.
+//        return drawInstancedToCamerasIfHolographic(data, indexCount, instances, baseVertexLocation);
+//#else
         mDeviceContext->DrawIndexedInstanced(indexCount, instances, 0, baseVertexLocation, 0);
-#endif
+//#endif
     }
     else
     {
@@ -2327,12 +2327,12 @@ gl::Error Renderer11::drawTriangleFan(const gl::Data &data,
 
     if (instances > 0)
     {
-#ifdef ANGLE_ENABLE_WINDOWS_HOLOGRAPHIC
-        // On Windows Holographic, we draw differently to the holographic camera.
-        return drawInstancedToCamerasIfHolographic(data, indexCount, instances, -minIndex);
-#else
+//#ifdef ANGLE_ENABLE_WINDOWS_HOLOGRAPHIC
+//        // On Windows Holographic, we draw differently to the holographic camera.
+//        return drawInstancedToCamerasIfHolographic(data, indexCount, instances, -minIndex);
+//#else
         mDeviceContext->DrawIndexedInstanced(indexCount, instances, 0, -minIndex, 0);
-#endif
+//#endif
     }
     else
     {
