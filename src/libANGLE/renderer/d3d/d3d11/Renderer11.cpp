@@ -2386,6 +2386,11 @@ gl::Error Renderer11::applyShadersImpl(const gl::Data &data, GLenum drawMode)
         return error;
     }
 
+    //HACK - mlf
+    //for now, assert that we NEVER freaking set a slow GS for holographic rendering paths
+    if(drawMode == GL_TRIANGLES && programD3D->getSupportsVprtShaders())
+      geometryExe = nullptr;
+
     ID3D11VertexShader *vertexShader = (vertexExe ? GetAs<ShaderExecutable11>(vertexExe)->getVertexShader() : NULL);
 
     ID3D11PixelShader *pixelShader = NULL;

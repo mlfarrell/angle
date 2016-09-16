@@ -329,11 +329,13 @@ void GL_APIENTRY DrawElementsInstancedANGLE(GLenum mode,
         static bool isHolographic = rx::HolographicNativeWindow::IsInitialized() && rx::HolographicSwapChain11::getIsAutomaticStereoRenderingEnabled();
         if (isHolographic)
         {
+#ifndef ANGLE_WINDOWS_HOLOGRAPHIC_ENABLE_DANGEROUS_OPTIMIZATIONS
             if (!ValidateDrawElementsInstancedANGLE(context, mode, count, type, indices, primcount / 2,
                                                     &indexRange))
             {
                 return;
             }
+#endif
         }
         else
 #endif
