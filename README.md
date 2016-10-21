@@ -19,3 +19,5 @@ Issues solved (that may or may not work on the experimental/official ms branch)
 - Added somewhat hacked angle_holographic_extensions.h include which contains access to certain Hololens SDK features
   - AngleHolographicGetCurrentPredictionTimestamp to obtain prediction timestamp for upcoming holographic frame
   - AngleHolographicSetCurrentFocusPointParameters to set image stabilization parameters for the holographic camera
+  
+It goes without saying that this is no longer a conforming OpenGL implementation :p
