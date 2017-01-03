@@ -137,7 +137,7 @@ HolographicSwapChain11::HolographicSwapChain11(Renderer11 *renderer,
                          HolographicNativeWindow* nativeWindow,
                          HANDLE shareHandle,
                          ABI::Windows::Graphics::Holographic::IHolographicCamera* pCamera)
-    : SwapChainD3D(*((NativeWindow*)nativeWindow), shareHandle, GL_RGBA, GL_DEPTH_COMPONENT16),
+    : SwapChainD3D(*((NativeWindow*)nativeWindow), shareHandle, GL_RGBA, GL_DEPTH_COMPONENT24),
       mHolographicNativeWindow(nativeWindow),
       mRenderer(renderer),
       mHolographicCamera(pCamera),
