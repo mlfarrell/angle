@@ -179,6 +179,7 @@ HolographicSwapChain11::HolographicSwapChain11(Renderer11 *renderer,
 
 HolographicSwapChain11::~HolographicSwapChain11()
 {
+    gDevice = nullptr;
     release();
     mDepthBufferPlaneFinder->ReleaseDeviceDependentResources();
 }
