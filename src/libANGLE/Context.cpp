@@ -1669,7 +1669,7 @@ void Context::recordError(const Error &error)
 
         if(error.getCode() != 1285)
         {
-          __debugbreak();
+          //__debugbreak();
         }
 
         if (!error.getMessage().empty())
