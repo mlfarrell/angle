@@ -97,20 +97,6 @@ __declspec(dllexport) decltype(gBoundingFrustum) AngleHolographicGetCurrentBound
   return gBoundingFrustum;
 }
 
-
-static ID3D11Device *gDevice = nullptr;
-static ID3D11DeviceContext *gContext = nullptr;
-__declspec(dllexport) ID3D11Device *AngleHolographicGetCurrentDevice()
-{
-  return gDevice;
-}
-__declspec(dllexport) ID3D11DeviceContext *AngleHolographicGetCurrentDeviceContext()
-{
-  return gContext;
-}
-
-///end hack
-
 namespace rx
 {
 
@@ -179,7 +165,6 @@ HolographicSwapChain11::HolographicSwapChain11(Renderer11 *renderer,
 
 HolographicSwapChain11::~HolographicSwapChain11()
 {
-    gDevice = nullptr;
     release();
     mDepthBufferPlaneFinder->ReleaseDeviceDependentResources();
 }
@@ -636,9 +621,6 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
 
             if (SUCCEEDED(result))
             {
-                gDevice = mRenderer->getDevice();
-                gContext = mRenderer->getDeviceContext();
-
                 // Update the view matrices. Holographic cameras (such as Microsoft HoloLens) are
                 // constantly moving relative to the world. The view matrices need to be updated
                 // every frame.

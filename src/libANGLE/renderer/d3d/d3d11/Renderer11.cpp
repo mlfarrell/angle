@@ -80,6 +80,17 @@
 #define ANGLE_SUPPRESS_D3D11_HAZARD_WARNINGS 1
 #endif
 
+static ID3D11Device *gDevice = nullptr;
+static ID3D11DeviceContext *gContext = nullptr;
+__declspec(dllexport) ID3D11Device *AngleHolographicGetCurrentDevice()
+{
+  return gDevice;
+}
+__declspec(dllexport) ID3D11DeviceContext *AngleHolographicGetCurrentDeviceContext()
+{
+  return gContext;
+}
+
 namespace rx
 {
 
@@ -609,6 +620,10 @@ Renderer11::Renderer11(egl::Display *display)
 
 Renderer11::~Renderer11()
 {
+    //- mlf
+    gDevice = nullptr;
+    gContext = nullptr;
+
     release();
 }
 
@@ -769,6 +784,10 @@ egl::Error Renderer11::initialize()
 
     initializeDevice();
 
+    //- mlf
+    gContext = mDeviceContext;
+    gDevice = mDevice;
+    
     return egl::Error(EGL_SUCCESS);
 }
 
