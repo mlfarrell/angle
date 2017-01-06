@@ -83,7 +83,7 @@ class HolographicNativeWindow : public InspectableNativeWindow, public std::enab
 
     static bool IsInitialized() { return mInitialized; }
     
-    void setRenderer11(Renderer11* renderer) { mRenderer = renderer; };
+    void setRenderer11(Renderer11* renderer);
     HRESULT setD3DDevice(ID3D11Device *device);
 
     void addHolographicCamera(ABI::Windows::Graphics::Holographic::IHolographicCamera *holographicCamera);

@@ -101,6 +101,9 @@ class HolographicSwapChain11 : public SwapChainD3D
     float const& GetFarPlane()          const { return mFarPlaneDistance;  }
     float const* GetDepthWeightArray()  const { return mDepthWeightArray;  }
 
+    //-mlf
+    inline ComPtr<ABI::Windows::Graphics::Holographic::IHolographicCamera> GetHolographicCamera() { return mHolographicCamera; }
+
   private:
 
     EGLint      resetOffscreenBuffers(

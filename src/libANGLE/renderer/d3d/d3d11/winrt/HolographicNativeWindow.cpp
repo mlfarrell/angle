@@ -49,11 +49,20 @@ __declspec(dllexport) ComPtr<ABI::Windows::Perception::IPerceptionTimestamp> Ang
 namespace rx
 {
 
+//"global" camera tracking state - mlf
+static std::vector<ComPtr<ABI::Windows::Graphics::Holographic::IHolographicCamera>> gHolographicCameras;
+
 bool HolographicNativeWindow::mInitialized = false;
 
 HolographicNativeWindow::~HolographicNativeWindow()
 {
     unregisterForHolographicCameraEvents();
+
+    gHolographicCameras.clear();
+    for(auto &swapChain : mHolographicCameras)
+    {
+      gHolographicCameras.push_back(swapChain.second->GetHolographicCamera());
+    }
 }
 
 bool HolographicNativeWindow::initialize(EGLNativeWindowType holographicSpace, IPropertySet *propertySet)
@@ -489,6 +498,24 @@ HRESULT HolographicNativeWindow::getPreferredDeviceFeatureSupport()
     }
 
     return hr;
+}
+
+void HolographicNativeWindow::setRenderer11(Renderer11 *renderer)
+{
+  mRenderer = renderer;
+
+  // In the case of full context loss, we may be spun up with a holographic space that already has existing cameras
+  // adding those here - mlf
+  {
+    std::lock_guard<std::mutex> locker(mHolographicCamerasLock);
+    for(auto holographicCamera : gHolographicCameras)
+    {
+      UINT32 id;
+      (void)holographicCamera->get_Id(&id);
+      HANDLE shareHandle = (void*)0;
+      mHolographicCameras[id] = std::make_unique<HolographicSwapChain11>(mRenderer, this, shareHandle, holographicCamera.Get());
+    }
+  }
 }
 
 // Initializes the HolographicSpace.
