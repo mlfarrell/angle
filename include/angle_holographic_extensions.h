@@ -16,3 +16,4 @@ __declspec(dllimport) Microsoft::WRL::ComPtr<ABI::Windows::Foundation::IReferenc
 __declspec(dllimport) ID3D11Device *AngleHolographicGetCurrentDevice();
 __declspec(dllimport) ID3D11DeviceContext *AngleHolographicGetCurrentDeviceContext();
 
+__declspec(dllexport) void AngleHolographicGetCurrentSwapChainDimensions(int *w, int *h, float *scaleFactor);

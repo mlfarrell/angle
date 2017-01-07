@@ -97,6 +97,16 @@ __declspec(dllexport) decltype(gBoundingFrustum) AngleHolographicGetCurrentBound
   return gBoundingFrustum;
 }
 
+//this one seems REALLLLLY unnecessary, but egl surface queries are giving me -1 and I don't want to risk more regressions - mlf
+static int gHoloSwapChainDimsX = -1, gHoloSwapChainDimsY = -1;
+static float gHoloSwapChainScaleFactor = -1;
+__declspec(dllexport) void AngleHolographicGetCurrentSwapChainDimensions(int *w, int *h, float *scaleFactor)
+{
+  *w = gHoloSwapChainDimsX;
+  *h = gHoloSwapChainDimsY;
+  *scaleFactor = gHoloSwapChainScaleFactor;
+}
+
 namespace rx
 {
 
@@ -145,6 +155,11 @@ HolographicSwapChain11::HolographicSwapChain11(Renderer11 *renderer,
     mHolographicCamera->get_RenderTargetSize(&mRenderTargetSize);
     mHolographicCamera->get_ViewportScaleFactor(&mViewportScaleFactor);
     mHolographicCamera->get_IsStereo(&mIsStereo);
+
+    //make note of dimensions - mlf
+    gHoloSwapChainDimsX = mRenderTargetSize.Width;
+    gHoloSwapChainDimsY = mRenderTargetSize.Height;
+    gHoloSwapChainScaleFactor = (float)mViewportScaleFactor;
 
     // cache the ID
     mHolographicCamera->get_Id(&mHolographicCameraId);
