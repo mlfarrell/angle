@@ -602,7 +602,7 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
         if(spCoordinateSystem != nullptr)
         {
             ComPtr<ABI::Windows::Graphics::Holographic::IHolographicCameraPose> spPose;
-            result = mHolographicNativeWindow->GetHolographicCameraPoses()->GetAt(mHolographicCameraId, spPose.GetAddressOf());
+            result = mHolographicNativeWindow->GetHolographicCameraPose(mHolographicCameraId, spPose.GetAddressOf());
 
             //TODO: make this optional if users don't need this (it would waste valuable frame computaton time)
             if (!SUCCEEDED(spPose->TryGetCullingFrustum(spCoordinateSystem.Get(), gBoundingFrustum.ReleaseAndGetAddressOf())))

@@ -141,6 +141,7 @@ class HolographicNativeWindow : public InspectableNativeWindow, public std::enab
     std::map<UINT32, std::unique_ptr<HolographicSwapChain11>>       mHolographicCameras;
     std::mutex                                                      mHolographicCamerasLock;
     ComPtr<ABI::Windows::Foundation::Collections::IVectorView<ABI::Windows::Graphics::Holographic::HolographicCameraPose*>> mHolographicCameraPoses;
+    std::map<UINT32, UINT32> mHolographicCameraIdToPoseMap;
     ComPtr<ABI::Windows::Graphics::Holographic::IHolographicFrame>  mHolographicFrame;
     ComPtr<ABI::Windows::Graphics::Holographic::IHolographicSpace>  mHolographicSpace;
     

@@ -682,6 +682,37 @@ HRESULT HolographicNativeWindow::UpdateHolographicResources()
     if (SUCCEEDED(hr))
     {
         hr = prediction->get_CameraPoses(mHolographicCameraPoses.ReleaseAndGetAddressOf());
+
+        // Maintain a mapping from holographic camera id to camera pose
+        if (SUCCEEDED(hr))
+        {
+          unsigned int size = 0;
+          HRESULT hr = mHolographicCameraPoses->get_Size(&size);
+
+          for (int i = 0; i < size; i++)
+          {
+            ComPtr<ABI::Windows::Graphics::Holographic::IHolographicCameraPose> cameraPose;
+            hr = mHolographicCameraPoses->GetAt(i, cameraPose.GetAddressOf());
+
+            if (SUCCEEDED(hr))
+            {
+              ComPtr<ABI::Windows::Graphics::Holographic::IHolographicCamera> cam;
+
+              hr = cameraPose->get_HolographicCamera(cam.ReleaseAndGetAddressOf());
+
+              if (SUCCEEDED(hr)) 
+              {
+                UINT32 camId;
+                hr = cam->get_Id(&camId);
+
+                if (SUCCEEDED(hr))
+                {
+                  mHolographicCameraIdToPoseMap[camId] = i;
+                }
+              }
+            }
+          }
+        }
     }
 
     // Get the coordinate system.
@@ -727,6 +758,15 @@ HRESULT HolographicNativeWindow::GetHolographicRenderingParameters(UINT32 id, AB
 
     unsigned int size = 0;
     HRESULT hr = mHolographicCameraPoses->get_Size(&size);
+
+    auto iter = mHolographicCameraIdToPoseMap.find(id);
+    if (iter == mHolographicCameraIdToPoseMap.end())
+    {
+        return E_BOUNDS;
+    }
+
+    id = iter->second;
+
     if (FAILED(hr))
     {
         return E_UNEXPECTED;
@@ -761,6 +801,15 @@ HRESULT HolographicNativeWindow::GetHolographicCameraPose(UINT32 id, ABI::Window
 
     unsigned int size = 0;
     HRESULT hr = mHolographicCameraPoses->get_Size(&size);
+
+    auto iter = mHolographicCameraIdToPoseMap.find(id);
+    if(iter == mHolographicCameraIdToPoseMap.end())
+    {
+      return E_BOUNDS;
+    }
+
+    id = iter->second;
+
     if (FAILED(hr))
     {
         return E_UNEXPECTED;
