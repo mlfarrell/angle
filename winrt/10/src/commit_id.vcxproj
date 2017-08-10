@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -35,24 +35,24 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <AppContainerApplication>true</AppContainerApplication>
     <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
-    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
-    <WindowsTargetPlatformMinVersion>10.0.10240.0</WindowsTargetPlatformMinVersion>
+    <WindowsTargetPlatformVersion>10.0.16257.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.16257.0</WindowsTargetPlatformMinVersion>
     <ApplicationType>Windows Store</ApplicationType>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Label="Locals">
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
-  <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props"/>
-  <ImportGroup Label="ExtensionSettings"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <ExecutablePath>$(ExecutablePath);$(MSBuildProjectDirectory)\..\..\..\third_party\cygwin\bin\;$(MSBuildProjectDirectory)\..\..\..\third_party\python_26\</ExecutablePath>
     <OutDir>$(SolutionDir)$(Configuration)_$(Platform)\</OutDir>
@@ -313,7 +313,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\..\..\src\angle.gyp"/>
+    <None Include="..\..\..\src\angle.gyp" />
     <None Include="..\..\..\.git\index">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </None>
@@ -321,7 +321,8 @@
   <ItemGroup>
     <CustomBuild Include="$(OutDir)obj\global_intermediate\angle\commit_id.bat">
       <FileType>Document</FileType>
-      <Command>call call &quot;$(OutDir)obj\global_intermediate\angle\commit_id.bat&quot; &quot;..\..\..\src\gen&quot; &quot;..\..\..&quot; &quot;$(OutDir)obj\global_intermediate\angle\id\commit.h&quot;&#xD;&#xA;if %errorlevel% neq 0 exit /b %errorlevel%</Command>
+      <Command>call call "$(OutDir)obj\global_intermediate\angle\commit_id.bat" "..\..\..\src\gen" "..\..\.." "$(OutDir)obj\global_intermediate\angle\id\commit.h"
+if %errorlevel% neq 0 exit /b %errorlevel%</Command>
       <Message>Generating ANGLE Commit ID</Message>
       <Outputs>$(OutDir)obj\global_intermediate\angle\id\commit.h</Outputs>
       <AdditionalInputs>..\..\..\.git\index</AdditionalInputs>
@@ -333,7 +334,7 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
-  <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets"/>
-  <ImportGroup Label="ExtensionTargets"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

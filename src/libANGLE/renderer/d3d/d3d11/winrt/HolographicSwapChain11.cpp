@@ -462,6 +462,34 @@ void HolographicSwapChain11::ComputeMidViewMatrix(
     }
 }
 
+BOOL IsEqual(ID3D11Texture2D *pTexture1, ID3D11Texture2D *pTexture2)
+{
+  IUnknown *u1, *u2;
+
+  if(!pTexture1 || !pTexture2)
+    return FALSE;
+
+  //doesn't work
+  /*pTexture1->QueryInterface(IID_IUnknown, (void **)&u1);
+  pTexture2->QueryInterface(IID_IUnknown, (void **)&u2);
+
+  BOOL areSame = u1 == u2;
+  u1->Release();
+  u2->Release();
+
+  return areSame;*/
+
+  //this honestly must be a bug in win SDK
+  //for now this this the best I can do...
+  D3D11_TEXTURE2D_DESC desc1, desc2;
+
+  pTexture1->GetDesc(&desc1);
+  pTexture2->GetDesc(&desc2);
+
+  //return memcmp(&desc1, &desc2, sizeof(desc1)) == 0;
+  return (desc1.Width == desc2.Width && desc1.Height == desc2.Height);
+}
+
 EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
     ComPtr<ABI::Windows::Graphics::Holographic::IHolographicCameraRenderingParameters>& spCameraRenderingParameters)
 {
@@ -517,7 +545,8 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
         }
 
         // Don't resize unnecessarily
-        if (mBackBufferTexture != spCameraBackBuffer)
+        //if (mBackBufferTexture != spCameraBackBuffer)
+        if (!IsEqual(mBackBufferTexture.Get(), spCameraBackBuffer.Get()))
         {
             // Can only recreate views if we have a resource
             ASSERT(spCameraBackBuffer);
