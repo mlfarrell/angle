@@ -462,34 +462,6 @@ void HolographicSwapChain11::ComputeMidViewMatrix(
     }
 }
 
-BOOL IsEqual(ID3D11Texture2D *pTexture1, ID3D11Texture2D *pTexture2)
-{
-  IUnknown *u1, *u2;
-
-  if(!pTexture1 || !pTexture2)
-    return FALSE;
-
-  //doesn't work
-  /*pTexture1->QueryInterface(IID_IUnknown, (void **)&u1);
-  pTexture2->QueryInterface(IID_IUnknown, (void **)&u2);
-
-  BOOL areSame = u1 == u2;
-  u1->Release();
-  u2->Release();
-
-  return areSame;*/
-
-  //this honestly must be a bug in win SDK
-  //for now this this the best I can do...
-  D3D11_TEXTURE2D_DESC desc1, desc2;
-
-  pTexture1->GetDesc(&desc1);
-  pTexture2->GetDesc(&desc2);
-
-  //return memcmp(&desc1, &desc2, sizeof(desc1)) == 0;
-  return (desc1.Width == desc2.Width && desc1.Height == desc2.Height);
-}
-
 EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
     ComPtr<ABI::Windows::Graphics::Holographic::IHolographicCameraRenderingParameters>& spCameraRenderingParameters)
 {
@@ -545,13 +517,12 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
         }
 
         // Don't resize unnecessarily
-        //if (mBackBufferTexture != spCameraBackBuffer)
-        if (!IsEqual(mBackBufferTexture.Get(), spCameraBackBuffer.Get()))
+        if (mBackBufferTexture != spCameraBackBuffer)
         {
             // Can only recreate views if we have a resource
             ASSERT(spCameraBackBuffer);
 
-            mBackBufferTexture.Reset();
+            //mBackBufferTexture.Reset();
             mBackBufferRTView.Reset();
             mBackBufferSRView.Reset();
 
@@ -564,7 +535,7 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
             // Creating this resource is inexpensive, and is better than keeping track of
             // the back buffers in order to pre-allocate render target views for each one.
             d3d11::SetDebugName(mBackBufferTexture.Get(), "Back buffer texture");
-            result = device->CreateRenderTargetView(mBackBufferTexture.Get(), NULL, &mBackBufferRTView);
+            result = device->CreateRenderTargetView(mBackBufferTexture.Get(), nullptr, &mBackBufferRTView);
             ASSERT(SUCCEEDED(result));
             if (SUCCEEDED(result))
             {
@@ -577,29 +548,23 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
             mBackBufferTexture->GetDesc(&backBufferDesc);
             mDxgiFormat = backBufferDesc.Format;
 
+            BOOL needsNewDepthStencil = FALSE;
+
             // Check for render target size changes.
             ABI::Windows::Foundation::Size currentSize;
             result = mHolographicCamera->get_RenderTargetSize(&currentSize);
             if (SUCCEEDED(result))
             {
                 if (mRenderTargetSize.Height != currentSize.Height ||
-                    mRenderTargetSize.Width != currentSize.Width)
+                    mRenderTargetSize.Width != currentSize.Width || !mDepthStencilTexture)
                 {
                     // Set render target size.
                     mRenderTargetSize = currentSize;
+                    needsNewDepthStencil = TRUE;
                 }
             }
 
-            if (SUCCEEDED(result))
-            {
-                result = device->CreateRenderTargetView(
-                    mBackBufferTexture.Get(),
-                    nullptr,
-                    &mBackBufferRTView
-                );
-            }
-
-            if (SUCCEEDED(result) && (backBufferDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE))
+            /*if (SUCCEEDED(result) && (backBufferDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE))
             {
                 CD3D11_SHADER_RESOURCE_VIEW_DESC desc(
                     mIsStereo ? D3D11_SRV_DIMENSION_TEXTURE2DARRAY : D3D11_SRV_DIMENSION_TEXTURE2D,
@@ -615,12 +580,15 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
                 {
                     d3d11::SetDebugName(mBackBufferSRView.Get(), "Back buffer shader resource");
                 }
-            }
+            }*/
 
             // A new depth stencil view is also needed.
-            return resetOffscreenBuffers(
+            if(needsNewDepthStencil)
+            {
+              resetOffscreenBuffers(
                 static_cast<EGLint>(mRenderTargetSize.Width),
                 static_cast<EGLint>(mRenderTargetSize.Height));
+            }
         }
     }
 
@@ -1075,13 +1043,13 @@ EGLint HolographicSwapChain11::present(IHolographicFrame* pFrame)
         // target.  Mark it dirty.
         mRenderer->markRenderTargetStateDirty();
 
-        ComPtr<ID3D11DeviceContext1> spContext = mRenderer->getDeviceContext1IfSupported();
+        //ComPtr<ID3D11DeviceContext1> spContext = mRenderer->getDeviceContext1IfSupported();
 
         // Discard the contents of the render target.
         // This is a valid operation only when the existing contents will be
         // entirely overwritten. If dirty or scroll rects are used, this call
         // should be removed.
-        if (mBackBufferRTView != nullptr)
+        /*if (mBackBufferRTView != nullptr)
         {
             spContext->DiscardView(mBackBufferRTView.Get());
         }
@@ -1090,7 +1058,7 @@ EGLint HolographicSwapChain11::present(IHolographicFrame* pFrame)
         if (mDepthStencilDSView != nullptr)
         {
             spContext->DiscardView(mDepthStencilDSView);
-        }
+        }*/
     }
 
     // The PresentUsingCurrentPrediction API will detect when the graphics device
