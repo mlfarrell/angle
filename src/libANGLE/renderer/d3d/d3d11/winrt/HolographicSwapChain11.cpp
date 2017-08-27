@@ -161,6 +161,28 @@ HolographicSwapChain11::HolographicSwapChain11(Renderer11 *renderer,
     gHoloSwapChainDimsY = mRenderTargetSize.Height;
     gHoloSwapChainScaleFactor = (float)mViewportScaleFactor;
 
+    //override camera plane defaults on immersive (TODO: expose this) - mlf
+    ComPtr<ABI::Windows::Graphics::Holographic::IHolographicDisplayStatics> holoDisplayClass;
+
+    if(SUCCEEDED(GetActivationFactory(HStringReference(RuntimeClass_Windows_Graphics_Holographic_HolographicDisplay).Get(), holoDisplayClass.GetAddressOf())))
+    {
+      ComPtr<ABI::Windows::Graphics::Holographic::IHolographicDisplay> holoDisplay;
+
+      if(SUCCEEDED(holoDisplayClass->GetDefault(holoDisplay.GetAddressOf())))
+      {
+        boolean opaque = false;
+
+        if(SUCCEEDED(holoDisplay->get_IsOpaque(&opaque)))
+        {
+          if(opaque)
+          {
+            mNearPlaneDistance = 0.1f;
+            mFarPlaneDistance = 1000.0f;
+          }
+        }
+      }
+    }
+
     // cache the ID
     mHolographicCamera->get_Id(&mHolographicCameraId);
     mHolographicCamera->SetNearPlaneDistance(mNearPlaneDistance);
@@ -871,8 +893,8 @@ EGLint HolographicSwapChain11::reset(int backbufferWidth, int backbufferHeight, 
             spPose->get_FarPlaneDistance(&mFarPlaneDistance);
 
             // Ensure the values we set previously made it through.
-            assert(mNearPlaneDistance ==  0.1f);
-            assert(mFarPlaneDistance  == 20.0f);
+            //assert(mNearPlaneDistance ==  0.1f);
+            //assert(mFarPlaneDistance  == 20.0f);
 
             ABI::Windows::Foundation::Rect viewportRect;
             spPose->get_Viewport(&viewportRect);
