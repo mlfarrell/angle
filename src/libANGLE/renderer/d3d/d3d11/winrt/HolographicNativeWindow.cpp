@@ -615,6 +615,13 @@ egl::Error HolographicNativeWindow::SetSpatialFrameOfReference(IInspectable * va
         result = frameOfReference.As(&mAttachedReferenceFrame);
     }
 
+    if (FAILED(result))
+    {
+      mStationaryReferenceFrame.Reset();
+      mAttachedReferenceFrame.Reset();
+      result = frameOfReference.As(&mStageReferenceFrame);
+    }
+
     if (SUCCEEDED(result))
     {
         return egl::Error(EGL_SUCCESS);
@@ -736,6 +743,15 @@ HRESULT HolographicNativeWindow::UpdateHolographicResources()
             {
                 hr = mAttachedReferenceFrame->GetStationaryCoordinateSystemAtTimestamp(timestamp.Get(), mCoordinateSystem.GetAddressOf());
             }
+        }
+        else if (mStageReferenceFrame != nullptr)
+        {
+          hr = mStageReferenceFrame->get_CoordinateSystem(mCoordinateSystem.GetAddressOf());
+
+          ComPtr<ABI::Windows::Perception::IPerceptionTimestamp> timestamp;
+          hr = prediction->get_Timestamp(timestamp.GetAddressOf());
+          if(SUCCEEDED(hr))
+            mostRecentPredictionTimestamp = timestamp;
         }
     }
 

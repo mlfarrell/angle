@@ -154,6 +154,9 @@ class HolographicNativeWindow : public InspectableNativeWindow, public std::enab
     // A reference frame attached to the holographic camera.
     ComPtr<ABI::Windows::Perception::Spatial::ISpatialLocatorAttachedFrameOfReference> mAttachedReferenceFrame;
 
+    // A reference frame relative to the ground/floor
+    ComPtr<ABI::Windows::Perception::Spatial::ISpatialStageFrameOfReference> mStageReferenceFrame;
+
     // A reference frame placed in the environment.
     ComPtr<ABI::Windows::Perception::Spatial::ISpatialStationaryFrameOfReference> mStationaryReferenceFrame;
 
