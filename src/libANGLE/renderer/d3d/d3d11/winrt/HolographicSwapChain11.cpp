@@ -682,7 +682,7 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
                 
                 // TODO: The display was being mirrored, so for now we hack these values to 
                 //       negative as far as the app is concerned.
-                viewTransform.Left.M11 = -viewTransform.Left.M11;
+                /*viewTransform.Left.M11 = -viewTransform.Left.M11;
                 viewTransform.Left.M12 = -viewTransform.Left.M12;
                 viewTransform.Left.M13 = -viewTransform.Left.M13;
                 viewTransform.Right.M11 = -viewTransform.Right.M11;
@@ -690,7 +690,7 @@ EGLint HolographicSwapChain11::updateHolographicRenderingParameters(
                 viewTransform.Right.M13 = -viewTransform.Right.M13;
                 mMidViewMatrix._11 = -mMidViewMatrix._11;
                 mMidViewMatrix._12 = -mMidViewMatrix._12;
-                mMidViewMatrix._13 = -mMidViewMatrix._13;
+                mMidViewMatrix._13 = -mMidViewMatrix._13;*/
 
                 // store view matrix
                 DirectX::XMFLOAT4X4 view[2];
