@@ -48,3 +48,5 @@ buildtools/
 *.ldf
 Generated Files/
 AppPackages/
+winrt/10/src/.vs/angle/v15/Solution.VC.db-shm
+winrt/10/src/.vs/angle/v15/Solution.VC.db-wal
