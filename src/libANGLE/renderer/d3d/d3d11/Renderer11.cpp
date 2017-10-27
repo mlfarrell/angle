@@ -791,6 +791,37 @@ egl::Error Renderer11::initialize()
     return egl::Error(EGL_SUCCESS);
 }
 
+//added utility method - mlf
+//https://developer.microsoft.com/en-us/windows/mixed-reality/rendering_in_directx#hybrid_graphics_pcs_and_mixed_reality_applications
+#ifdef ANGLE_ENABLE_WINDOWS_HOLOGRAPHIC
+IDXGIAdapter* GetAdapterFromId(ABI::Windows::Graphics::Holographic::HolographicAdapterId &adapterId)
+{
+  ComPtr<IDXGIFactory1> spDXGIFactory;
+  HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&spDXGIFactory);
+  if(FAILED(hr))
+    return nullptr;
+
+  ComPtr<IDXGIAdapter> spDXGIAdapter;
+  for(UINT i = 0; spDXGIFactory->EnumAdapters(i, &spDXGIAdapter) != DXGI_ERROR_NOT_FOUND; ++i)
+  {
+    DXGI_ADAPTER_DESC desc;
+    if(FAILED(spDXGIAdapter->GetDesc(&desc)))
+    {
+      spDXGIAdapter.Reset();
+      continue;
+    }
+
+    if(desc.AdapterLuid.HighPart == adapterId.HighPart &&
+      desc.AdapterLuid.LowPart == adapterId.LowPart)
+    {
+      break;
+    }
+  }
+
+  return spDXGIAdapter.Detach();
+}
+#endif
+
 egl::Error Renderer11::initializeD3DDevice()
 {
     HRESULT result = S_OK;
@@ -852,13 +883,35 @@ egl::Error Renderer11::initializeD3DDevice()
             SCOPED_ANGLE_HISTOGRAM_TIMER("GPU.ANGLE.D3D11CreateDeviceMS");
             TRACE_EVENT0("gpu.angle", "D3D11CreateDevice");
 
+            ComPtr<IDXGIAdapter> spDXGIAdapter;
+            auto driverType = mRequestedDriverType;
+
 #ifdef ANGLE_ENABLE_WINDOWS_HOLOGRAPHIC
             UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+
+            ComPtr<ABI::Windows::Graphics::Holographic::IHolographicDisplayStatics> holoDisplayClass;
+
+            if(SUCCEEDED(GetActivationFactory(HStringReference(RuntimeClass_Windows_Graphics_Holographic_HolographicDisplay).Get(), holoDisplayClass.GetAddressOf())))
+            {
+              ComPtr<ABI::Windows::Graphics::Holographic::IHolographicDisplay> holoDisplay;
+
+              if(SUCCEEDED(holoDisplayClass->GetDefault(holoDisplay.GetAddressOf())))
+              {
+                ABI::Windows::Graphics::Holographic::HolographicAdapterId adadpterId;
+
+                if(SUCCEEDED(holoDisplay->get_AdapterId(&adadpterId)))
+                {
+                  spDXGIAdapter = GetAdapterFromId(adadpterId);
+                  if(spDXGIAdapter.Get())
+                    driverType = D3D_DRIVER_TYPE_UNKNOWN;
+                }
+              }
+            }
 #else
             UINT creationFlags = 0;
 #endif
             result = D3D11CreateDevice(
-                nullptr, mRequestedDriverType, nullptr,
+                spDXGIAdapter.Get(), driverType, nullptr,
                 creationFlags, mAvailableFeatureLevels.data(),
                 static_cast<unsigned int>(mAvailableFeatureLevels.size()),
                 D3D11_SDK_VERSION, &mDevice,
